@@ -34,10 +34,7 @@
           </a-typography-link>
           <div class="task_actions">
             <a-checkbox v-model:checked="task.isDone" />
-            <DeleteOutlined
-              v-if="mode === 'delet e'"
-              @click="() => deleteTask(task.id)"
-            ></DeleteOutlined>
+            <DeleteOutlined v-if="mode === 'delete'" @click="() => deleteTask(task.id)" />
           </div>
         </div>
       </div>
@@ -48,23 +45,20 @@
 <script lang="ts" setup>
 import { computed, h, onMounted, reactive, ref, watch } from 'vue'
 import { useLocalStorage } from '@vueuse/core'
-import type { Task } from '@/types'
+import type { Filter, Task } from '@/views/types'
 import { AppstoreAddOutlined, DeleteOutlined } from '@ant-design/icons-vue'
 import EditTask from '@/views/todoList/components/EditTask.vue'
 import { StorageKeys, TasksFilters } from '@/views/enums'
 
-type Filter = {
-  label: string
-  value: TasksFilters
-}
 const filters = reactive<Filter[]>([
   { label: 'Все', value: TasksFilters.All },
   { label: 'Незавершенные', value: TasksFilters.Unfinished },
   { label: 'Завершенные', value: TasksFilters.Finished }
 ])
-const currentFilter = ref('all')
+const currentFilter = ref(TasksFilters.All)
 const tasks = useLocalStorage<Task[]>(StorageKeys.Tasks, [])
 const editTaskId = useLocalStorage<string | null>(StorageKeys.EditTaskId, null)
+const isModalOpened = useLocalStorage(StorageKeys.IsMpdalOpened, false)
 
 const displayedTasks = computed(() => {
   if (currentFilter.value === TasksFilters.Finished)
@@ -73,15 +67,16 @@ const displayedTasks = computed(() => {
     return tasks.value.filter((state) => !state.isDone)
   return tasks.value
 })
-
+const newTaskTitle = ref()
 const mode = ref<'view' | 'delete'>('view')
+
 const toggleMode = () => {
   mode.value === 'view' ? (mode.value = 'delete') : (mode.value = 'view')
 }
 const deleteTask = (id: string) => {
   tasks.value = tasks.value.filter((state) => state.id !== id)
 }
-const newTaskTitle = ref()
+
 const onAddNewTask = () => {
   if (!newTaskTitle.value) return
   const id = 'task-id' + new Date().getTime()
@@ -92,11 +87,11 @@ const onAddNewTask = () => {
   })
   newTaskTitle.value = null
 }
+
 const onTaskClick = (taskId: string) => {
   editTaskId.value = taskId
   isModalOpened.value = true
 }
-const isModalOpened = useLocalStorage(StorageKeys.IsMpdalOpened, false)
 const closeModal = () => {
   isModalOpened.value = false
 }
@@ -153,16 +148,5 @@ onMounted(() => {
 
 .task-list {
   padding: 5px;
-}
-
-/* we will explain what these classes do next! */
-.v-enter-active,
-.v-leave-active {
-  transition: opacity 0.5s ease;
-}
-
-.v-enter-from,
-.v-leave-to {
-  opacity: 0;
 }
 </style>

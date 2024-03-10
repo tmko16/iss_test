@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useLocalStorage } from '@vueuse/core'
-import type { Task } from '@/types'
+import type { Task } from '@/views/types'
 import { StorageKeys } from '@/views/enums'
 import { computed, reactive, watch } from 'vue'
 
