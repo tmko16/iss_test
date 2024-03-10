@@ -7,7 +7,7 @@
     title="Редактировать задачу"
     @cancel="closeModal"
   >
-    <edit-task />
+    <edit-task v-if="isModalOpened" />
   </a-modal>
   <a-layout class="layout">
     <a-layout-content class="layout--content">
